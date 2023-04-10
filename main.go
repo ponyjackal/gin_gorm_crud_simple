@@ -30,12 +30,13 @@ func main() {
 	db.Find(&people)
 
 	r := gin.Default()
-	r.GET("/", GetProjects)
+	r.GET("/people/", GetPeople)
+	r.GET("/people/:id", GetPerson)
 
 	r.Run(":8080")
 }
 
-func GetProjects(c *gin.Context) {
+func GetPeople(c *gin.Context) {
 	var people []Person
 
 	if err := db.Find(&people).Error; err != nil {
@@ -43,5 +44,17 @@ func GetProjects(c *gin.Context) {
 		fmt.Println(err)
 	} else {
 		c.JSON(200, people)
+	}
+}
+
+func GetPerson(c *gin.Context) {
+	id := c.Params.ByName("id")
+	var person Person
+
+	if err := db.Where("id=?", id).First(&person).Error; err != nil {
+		c.AbortWithStatus(404)
+		fmt.Println(err)
+	} else {
+		c.JSON(200, person)
 	}
 }
