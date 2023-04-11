@@ -33,6 +33,7 @@ func main() {
 	r.GET("/people/", GetPeople)
 	r.GET("/people/:id", GetPerson)
 	r.POST("/people", CreatePerson)
+	r.PUT("/people/:id", UpdatePerson)
 
 	r.Run(":8080")
 }
@@ -65,5 +66,20 @@ func CreatePerson(c *gin.Context) {
 	c.BindJSON(&person)
 
 	db.Create(&person)
+	c.JSON(200, person)
+}
+
+func UpdatePerson(c *gin.Context) {
+	var person Person
+	id := c.Params.ByName("id")
+
+	if err := db.Where("id=?", id).First(&person).Error; err != nil {
+		c.AbortWithStatus(404)
+		fmt.Println(err)
+	}
+
+	c.BindJSON(&person)
+
+	db.Save(&person)
 	c.JSON(200, person)
 }
