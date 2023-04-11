@@ -34,6 +34,7 @@ func main() {
 	r.GET("/people/:id", GetPerson)
 	r.POST("/people", CreatePerson)
 	r.PUT("/people/:id", UpdatePerson)
+	r.DELETE("/people/:id", DeletePerson)
 
 	r.Run(":8080")
 }
@@ -82,4 +83,15 @@ func UpdatePerson(c *gin.Context) {
 
 	db.Save(&person)
 	c.JSON(200, person)
+}
+
+func DeletePerson(c *gin.Context) {
+	var person Person
+	id := c.Params.ByName("id")
+
+	d := db.Where("id=?", id).Delete(&person)
+	fmt.Println(d)
+
+	c.JSON(200, gin.H{"id #" + id: "delete"})
+
 }
